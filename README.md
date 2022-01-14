@@ -6,6 +6,13 @@ Este documento define os padrões e boas práticas que adotamos ao escrever cód
 
 ## Como esse guia está organizado
 
+- [Arquitetura](https://github.com/betrybe/playbook-go/blob/main/README.md#arquitetura)
+- [Variáveis de configuração](https://github.com/betrybe/playbook-go/blob/main/README.md#variáveis-de-configuração)
+- [Estrutura do repositório](https://github.com/betrybe/playbook-go/blob/main/README.md#estrutura-do-repositório)
+- [Erros](https://github.com/betrybe/playbook-go/blob/main/README.md#erros)
+- [Pacotes externos](https://github.com/betrybe/playbook-go/blob/main/README.md#pacotes-externos)
+- [IDEs](https://github.com/betrybe/playbook-go/blob/main/README.md#ides)
+
 
 ## Arquitetura
 
