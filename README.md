@@ -395,7 +395,9 @@ func TestSomething(t *testing.T) {
 
 ### Mocks
 
-A ser definido. 
+Usamos o [testify/mock](https://github.com/stretchr/testify) e o [mockery](https://github.com/vektra/mockery) como solução para mocks em nossos testes. 
+
+Usamos essa [referência](https://blog.codecentric.de/2019/07/gomock-vs-testify/) para tomar a decisão. Este link também serve como introdução as principais features da solução.
 
 ### ORM X SQL
 
