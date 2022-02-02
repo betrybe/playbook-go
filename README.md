@@ -238,7 +238,7 @@ type Error struct {
 
 **Papel da aplicação/operação**
 
-Como estamos usando a Clean Architecture, as camadas de UseCase e Framework&Driver (Repositories, Queue, Forum, etc) devem seguir as seguintes regras:
+Como estamos usando a Clean Architecture, as camadas de UseCase e Framework&Driver (Repositories, Queue,  etc) devem seguir as seguintes regras:
 
 - Devem sempre retornar um erro caso exista, e não fazer log
 
