@@ -206,22 +206,22 @@ package errors
 
 // Application error codes.
 const (
-	ECONFLICT  = "conflict"  // action cannot be performed
-	EINTERNAL  = "internal"  // internal error
-	EINVALID   = "invalid"   // validation failed
-	ENOTFOUND  = "not_found" // entity does not exist
-	EFORBIDDEN = "forbidden" //operation forbidden
-	EEXPECTED  = "expected"  //expected error that don't need to be logged
-	ETIMEOUT   = "timeout"
+ ECONFLICT  = "conflict"  // action cannot be performed
+ EINTERNAL  = "internal"  // internal error
+ EINVALID   = "invalid"   // validation failed
+ ENOTFOUND  = "not_found" // entity does not exist
+ EFORBIDDEN = "forbidden" //operation forbidden
+ EEXPECTED  = "expected"  //expected error that don't need to be logged
+ ETIMEOUT   = "timeout"
 )
 
 // Error defines a standard application error.
 type Error struct {
-	Code    string // Machine-readable error code (papel da aplicação)
-	Message string // Human-readable message (papel do usuário final)
-	Op      string // Logical operation (papel da operação)
-	Err     error  // Embedded error  (papel da operação)
-	Detail  []byte // JSON encoded data  (papel da operação)
+ Code    string // Machine-readable error code (papel da aplicação)
+ Message string // Human-readable message (papel do usuário final)
+ Op      string // Logical operation (papel da operação)
+ Err     error  // Embedded error  (papel da operação)
+ Detail  []byte // JSON encoded data  (papel da operação)
 }
 ```
 
@@ -291,10 +291,10 @@ De acordo com a Clean Architecture, a camada responsável pela interação com a
 ```go
 a, err := services.Address.Find(entity.StringToID(id))
 if err != nil {
-	err.Message = "Erro lendo endereço"
-	errorService.Log(err, elog.ERROR)
-	errorService.RespondWithError(w, http.StatusNotFound, errors.ErrorCode(err), errors.ErrorMessage(err))
-	return
+ err.Message = "Erro lendo endereço"
+ errorService.Log(err, elog.ERROR)
+ errorService.RespondWithError(w, http.StatusNotFound, errors.ErrorCode(err), errors.ErrorMessage(err))
+ return
 }
 ```
 
@@ -356,30 +356,30 @@ Exemplo de teste usando o testify:
 package yours
 
 import (
-	"testing"
+ "testing"
 
-	"github.com/stretchr/testify/assert"
+ "github.com/stretchr/testify/assert"
 )
 
 func TestSomething(t *testing.T) {
 
-	// assert equality
-	assert.Equal(t, 123, 123, "they should be equal")
+ // assert equality
+ assert.Equal(t, 123, 123, "they should be equal")
 
-	// assert inequality
-	assert.NotEqual(t, 123, 456, "they should not be equal")
+ // assert inequality
+ assert.NotEqual(t, 123, 456, "they should not be equal")
 
-	// assert for nil (good for errors)
-	assert.Nil(t, object)
+ // assert for nil (good for errors)
+ assert.Nil(t, object)
 
-	// assert for not nil (good when you expect something)
-	if assert.NotNil(t, object) {
+ // assert for not nil (good when you expect something)
+ if assert.NotNil(t, object) {
 
-		// now we know that object isn't nil, we are safe to make
-		// further assertions without causing any errors
-		assert.Equal(t, "Something", object.Value)
+  // now we know that object isn't nil, we are safe to make
+  // further assertions without causing any errors
+  assert.Equal(t, "Something", object.Value)
 
-	}
+ }
 }
 ```
 
