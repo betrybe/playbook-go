@@ -1,4 +1,4 @@
-# Guia de padrões e boas práticas em Go
+# The Trybe Go Style Guide.
 
 Other language versions of the playbook:
 [Portuguese (pt-BR)](./README.md)
