@@ -203,31 +203,25 @@ Dado o entendimento de que precisamos de códigos de erro, mensagens por humanos
 
 ```go
 package errors
- 
-import (
-   "bytes"
-   "encoding/json"
-   "fmt"
-)
- 
+
 // Application error codes.
 const (
-   ECONFLICT  = "conflict"  // action cannot be performed
-   EINTERNAL  = "internal"  // internal error
-   EINVALID   = "invalid"   // validation failed
-   ENOTFOUND  = "not_found" // entity does not exist
-   EFORBIDDEN = "forbidden" //operation forbidden
-   EEXPECTED  = "expected"  //expected error that don't need to be logged
-   ETIMEOUT   = "timeout"
+	ECONFLICT  = "conflict"  // action cannot be performed
+	EINTERNAL  = "internal"  // internal error
+	EINVALID   = "invalid"   // validation failed
+	ENOTFOUND  = "not_found" // entity does not exist
+	EFORBIDDEN = "forbidden" //operation forbidden
+	EEXPECTED  = "expected"  //expected error that don't need to be logged
+	ETIMEOUT   = "timeout"
 )
- 
+
 // Error defines a standard application error.
 type Error struct {
-   Code    string // Machine-readable error code (papel da aplicação)
-   Message string // Human-readable message (papel do usuário final)
-   Op      string // Logical operation (papel da operação)
-   Err     error  // Embedded error  (papel da operação)
-   Detail  []byte // JSON encoded data  (papel da operação)
+	Code    string // Machine-readable error code (papel da aplicação)
+	Message string // Human-readable message (papel do usuário final)
+	Op      string // Logical operation (papel da operação)
+	Err     error  // Embedded error  (papel da operação)
+	Detail  []byte // JSON encoded data  (papel da operação)
 }
 ```
 
@@ -266,27 +260,27 @@ Escolher uma das opções a seguir, definidas no arquivo *internal/errors/errors
 ```go
 //Find address na camada de repositório
 func (r *MongoRepository) Find(id entity.ID) (*entity.Address, error) {
- result := entity.Address{}
- session := r.pool.Session(nil)
- defer session.Close()
- coll := session.DB(r.db).C("address")
- err := coll.Find(bson.M{"_id": id}).One(&result)
+	result := entity.Address{}
+	session := r.pool.Session(nil)
+	defer session.Close()
+	coll := session.DB(r.db).C("address")
+	err := coll.Find(bson.M{"_id": id}).One(&result)
 
- if err != nil {
-  return nil, &errors.Error{Op: "address.MongoRepository.Find", Err: err, Code: errors.ENOTFOUND}
- }
- return &result, nil
+	if err != nil {
+		return nil, &errors.Error{Op: "address.MongoRepository.Find", Err: err, Code: errors.ENOTFOUND}
+	}
+	return &result, nil
 }
 ```
 
 ```go
 //Find an address na camada de serviço
 func (s *Service) Find(id entity.ID) (*entity.Address, error) {
- a, err := s.repo.Find(id) //está usando o MongoRepository
- if err != nil {
-  return nil, &errors.Error{Op: "address.Service.Find", Err: err, Code: errors.ErrorCode(err)}
- }
- return a, nil
+	a, err := s.repo.Find(id) //está usando o MongoRepository
+	if err != nil {
+		return nil, &errors.Error{Op: "address.Service.Find", Err: err, Code: errors.ErrorCode(err)}
+	}
+	return a, nil
 }
 ```
 
@@ -297,10 +291,10 @@ De acordo com a Clean Architecture, a camada responsável pela interação com a
 ```go
 a, err := services.Address.Find(entity.StringToID(id))
 if err != nil {
- err.Message = "Erro lendo endereço"
- errorService.Log(err, elog.ERROR)
-  errorService.RespondWithError(w, http.StatusNotFound, errors.ErrorCode(err), errors.ErrorMessage(err))
- return
+	err.Message = "Erro lendo endereço"
+	errorService.Log(err, elog.ERROR)
+	errorService.RespondWithError(w, http.StatusNotFound, errors.ErrorCode(err), errors.ErrorMessage(err))
+	return
 }
 ```
 
