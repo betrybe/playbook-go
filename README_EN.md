@@ -204,6 +204,12 @@ After understanding the reason for error code, messaging by humans, and logical 
 ```go
 package errors
 
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+)
+
 // Application error codes.
 const (
 	ECONFLICT  = "conflict"  // action cannot be performed
@@ -265,7 +271,6 @@ func (r *MongoRepository) Find(id entity.ID) (*entity.Address, error) {
 	defer session.Close()
 	coll := session.DB(r.db).C("address")
 	err := coll.Find(bson.M{"_id": id}).One(&result)
-
 	if err != nil {
 		return nil, &errors.Error{Op: "address.MongoRepository.Find", Err: err, Code: errors.ENOTFOUND}
 	}
@@ -357,7 +362,6 @@ package yours
 
 import (
 	"testing"
-
 	"github.com/stretchr/testify/assert"
 )
 
