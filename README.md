@@ -2,17 +2,16 @@
 
 Este documento define os padrões e boas práticas que adotamos ao escrever código Go na Trybe. Este guia está separados por tema, e priorizados pela necessidade e impacto na qualidade do nosso código.
 
-**Observação:** Este é um documento vivo e reflete as necessidades da Trybe, que podem mudar com o tempo, assim como as decisões que tomamos para melhor resolver nossos problemas.
+> **Observação:** Este é um documento vivo e reflete as necessidades da Trybe, que podem mudar com o tempo, assim como as decisões que tomamos para melhor resolver nossos problemas.
 
 ## Como esse guia está organizado
 
-- [Arquitetura](https://github.com/betrybe/playbook-go/blob/main/README.md#arquitetura)
-- [Variáveis de configuração](https://github.com/betrybe/playbook-go/blob/main/README.md#variáveis-de-configuração)
-- [Estrutura do repositório](https://github.com/betrybe/playbook-go/blob/main/README.md#estrutura-do-repositório)
-- [Erros](https://github.com/betrybe/playbook-go/blob/main/README.md#erros)
-- [Pacotes externos](https://github.com/betrybe/playbook-go/blob/main/README.md#pacotes-externos)
-- [IDEs](https://github.com/betrybe/playbook-go/blob/main/README.md#ides)
-
+- [Arquitetura](#arquitetura)
+- [Variáveis de configuração](#variáveis-de-configuração)
+- [Estrutura do repositório](#estrutura-do-repositório)
+- [Erros](#erros)
+- [Pacotes externos](#pacotes-externos)
+- [IDEs](#ides)
 
 ## Arquitetura
 
@@ -30,16 +29,15 @@ Organizamos nossos códigos usando a Clean Architecture. Mais sobre a arquitetur
 
 De acordo com as [recomendações](https://12factor.net/config) documentadas no projeto [12 factor](https://12factor.net) armazenamos as configurações que mudam de acordo com o ambiente (`staging`, `dev`, `production`) em variáveis de ambiente. E as configurações que não dependem do ambiente são armazenadas em arquivos no formato [TOML](https://toml.io/en/) dentro do repositório. Para facilitar o gerenciamento das configurações usamos a biblioteca [Viper](https://github.com/spf13/viper).
 
-
 ## Estrutura do repositório
 
 Usamos o conceito de monorepo, com os projetos compartilhando o mesmo repositório no Github.
 
-**Vantagens:** 
+**Vantagens:**
 
 - fácil gerenciar as dependências e reaproveitar código. Com a evolução dos projetos vamos criar pacotes que são comuns a vários projetos (métricas, log, erros, etc) e ter tudo no mesmo repositório facilita a reutilização
 
-**Desvantagens**
+**Desvantagens:**
 
 - CI/CD mais complexo pois teríamos que ter opção para gerar o binário e fazer deploy de diferentes apps
 
@@ -175,7 +173,7 @@ Abaixo um exemplo de como o repositório é organizado, com múltiplos projetos.
 A parte complicada sobre os erros é que eles precisam ser coisas diferentes para consumidores diferentes deles. Em qualquer sistema, temos pelo menos 3 papéis que são consumidores - a aplicação, o usuário final e a operação.
 
 **O papel da aplicação**
- 
+
 Sua primeira linha de defesa no tratamento de erros é o próprio aplicativo. O código do seu aplicativo pode se recuperar de estados de erro rapidamente e sem chamar ninguém no meio da noite. No entanto, o tratamento de erros do aplicativo é o menos flexível e só pode tratar estados de erro bem definidos.
 
 Um exemplo disso é o seu navegador recebendo um código de redirecionamento 301 e navegando para um novo local. É um processo contínuo que a maioria dos usuários ignora. É capaz de fazer isso porque a especificação HTTP têm códigos de erro bem definidos.
@@ -192,8 +190,7 @@ Esses usuários ainda estão limitados a erros bem definidos, pois revelar erros
 
 Finalmente, a última linha de defesa é o operador do sistema, que pode ser um desenvolvedor ou uma pessoa de operações. Essas pessoas entendem os detalhes do sistema e podem trabalhar com qualquer tipo de erro.
 
-Nesta função, você normalmente deseja ver o máximo de informações possível. Além do código de erro e da mensagem legível por humanos, um rastreamento de pilha lógico pode ajudar o operador a entender o fluxo do programa. 
-
+Nesta função, você normalmente deseja ver o máximo de informações possível. Além do código de erro e da mensagem legível por humanos, um rastreamento de pilha lógico pode ajudar o operador a entender o fluxo do programa.
 
 [Referência](https://middlemost.com/failure-is-your-domain/)
 
@@ -231,9 +228,6 @@ type Error struct {
 }
 ```
 
-
-
-
 ### Gerenciamento de erro pelo papel
 
 **Papel da aplicação/operação**
@@ -262,34 +256,34 @@ Escolher uma das opções a seguir, definidas no arquivo *internal/errors/errors
 - EINVALID // validation failed - Erros de lógica criadas por nós. Exemplo: salvar um usuário no banco de dados
 - ENOTFOUND // entity does not exist
 - EFORBIDDEN //operation forbidden
-- EEXPECTED //expected error that don't need to be logged. 
+- EEXPECTED //expected error that don't need to be logged.
 
 **Exemplos de erros:**
 
 ```go
 //Find address na camada de repositório
 func (r *MongoRepository) Find(id entity.ID) (*entity.Address, error) {
-	result := entity.Address{}
-	session := r.pool.Session(nil)
-	defer session.Close()
-	coll := session.DB(r.db).C("address")
-	err := coll.Find(bson.M{"_id": id}).One(&result)
+    result := entity.Address{}
+    session := r.pool.Session(nil)
+    defer session.Close()
+    coll := session.DB(r.db).C("address")
+    err := coll.Find(bson.M{"_id": id}).One(&result)
 
-	if err != nil {
-		return nil, &errors.Error{Op: "address.MongoRepository.Find", Err: err, Code: errors.ENOTFOUND}
-	}
-	return &result, nil
+    if err != nil {
+        return nil, &errors.Error{Op: "address.MongoRepository.Find", Err: err, Code: errors.ENOTFOUND}
+    }
+    return &result, nil
 }
 ```
 
 ```go
 //Find an address na camada de serviço
 func (s *Service) Find(id entity.ID) (*entity.Address, error) {
-	a, err := s.repo.Find(id) //está usando o MongoRepository
-	if err != nil {
-		return nil, &errors.Error{Op: "address.Service.Find", Err: err, Code: errors.ErrorCode(err)}
-	}
-	return a, nil
+  a, err := s.repo.Find(id) //está usando o MongoRepository
+  if err != nil {
+     return nil, &errors.Error{Op: "address.Service.Find", Err: err, Code: errors.ErrorCode(err)}
+  }
+  return a, nil
 }
 ```
 
@@ -300,10 +294,10 @@ De acordo com a Clean Architecture, a camada responsável pela interação com a
 ```go
 a, err := services.Address.Find(entity.StringToID(id))
 if err != nil {
-	err.Message = "Erro lendo endereço"
-	errorService.Log(err, elog.ERROR)
-  errorService.RespondWithError(w, http.StatusNotFound, errors.ErrorCode(err), errors.ErrorMessage(err))
-	return
+    err.Message = "Erro lendo endereço"
+    errorService.Log(err, elog.ERROR)
+    errorService.RespondWithError(w, http.StatusNotFound, errors.ErrorCode(err), errors.ErrorMessage(err))
+    return
 }
 ```
 
@@ -365,37 +359,36 @@ Exemplo de teste usando o testify:
 package yours
 
 import (
-  "testing"
-  "github.com/stretchr/testify/assert"
+    "testing"
+    "github.com/stretchr/testify/assert"
 )
 
 func TestSomething(t *testing.T) {
 
-  // assert equality
-  assert.Equal(t, 123, 123, "they should be equal")
+    // assert equality
+    assert.Equal(t, 123, 123, "they should be equal")
 
-  // assert inequality
-  assert.NotEqual(t, 123, 456, "they should not be equal")
+    // assert inequality
+    assert.NotEqual(t, 123, 456, "they should not be equal")
 
-  // assert for nil (good for errors)
-  assert.Nil(t, object)
+    // assert for nil (good for errors)
+    assert.Nil(t, object)
 
-  // assert for not nil (good when you expect something)
-  if assert.NotNil(t, object) {
+    // assert for not nil (good when you expect something)
+    if assert.NotNil(t, object) {
 
-    // now we know that object isn't nil, we are safe to make
-    // further assertions without causing any errors
-    assert.Equal(t, "Something", object.Value)
+        // now we know that object isn't nil, we are safe to make
+        // further assertions without causing any errors
+        assert.Equal(t, "Something", object.Value)
 
-  }
+    }
 
 }
 ```
 
-
 ### Mocks
 
-Usamos o [testify/mock](https://github.com/stretchr/testify) e o [mockery](https://github.com/vektra/mockery) como solução para mocks em nossos testes. 
+Usamos o [testify/mock](https://github.com/stretchr/testify) e o [mockery](https://github.com/vektra/mockery) como solução para mocks em nossos testes.
 
 Usamos essa [referência](https://blog.codecentric.de/2019/07/gomock-vs-testify/) para tomar a decisão. Este link também serve como introdução as principais features da solução.
 
@@ -403,15 +396,13 @@ Usamos essa [referência](https://blog.codecentric.de/2019/07/gomock-vs-testify/
 
 A ser definido.
 
-
 ## IDEs
 
 Recomendamos o uso do Visual Studio Code, por ser usado também por todas as equipes da Trybe.
 
 É necessário a instalação da [extensão oficial da linguagem Go](https://code.visualstudio.com/docs/languages/go).
 
-
-### Sugestão de configuração do VS Code:
+### Sugestão de configuração do VS Code
 
 ```json
 {
@@ -424,7 +415,7 @@ Recomendamos o uso do Visual Studio Code, por ser usado também por todas as equ
     "ui.semanticTokens": true
   },
   "go.lintOnSave": "file",
-  "go.lintTool": "golint",	
+  "go.lintTool": "golint", 
   "go.formatTool": "goimports",
   "go.useLanguageServer": true,
   "[go]": {
