@@ -1,5 +1,8 @@
 # Guia de padrões e boas práticas em Go
 
+Versão do playbook em outros idiomas:
+[Inglês](./README_EN.md)
+
 Este documento define os padrões e boas práticas que adotamos ao escrever código Go na Trybe. Este guia está separados por tema, e priorizados pela necessidade e impacto na qualidade do nosso código.
 
 > **Observação:** Este é um documento vivo e reflete as necessidades da Trybe, que podem mudar com o tempo, assim como as decisões que tomamos para melhor resolver nossos problemas.
@@ -200,31 +203,25 @@ Dado o entendimento de que precisamos de códigos de erro, mensagens por humanos
 
 ```go
 package errors
- 
-import (
-   "bytes"
-   "encoding/json"
-   "fmt"
-)
- 
+
 // Application error codes.
 const (
-   ECONFLICT  = "conflict"  // action cannot be performed
-   EINTERNAL  = "internal"  // internal error
-   EINVALID   = "invalid"   // validation failed
-   ENOTFOUND  = "not_found" // entity does not exist
-   EFORBIDDEN = "forbidden" //operation forbidden
-   EEXPECTED  = "expected"  //expected error that don't need to be logged
-   ETIMEOUT   = "timeout"
+ ECONFLICT  = "conflict"  // action cannot be performed
+ EINTERNAL  = "internal"  // internal error
+ EINVALID   = "invalid"   // validation failed
+ ENOTFOUND  = "not_found" // entity does not exist
+ EFORBIDDEN = "forbidden" //operation forbidden
+ EEXPECTED  = "expected"  //expected error that don't need to be logged
+ ETIMEOUT   = "timeout"
 )
- 
+
 // Error defines a standard application error.
 type Error struct {
-   Code    string // Machine-readable error code (papel da aplicação)
-   Message string // Human-readable message (papel do usuário final)
-   Op      string // Logical operation (papel da operação)
-   Err     error  // Embedded error  (papel da operação)
-   Detail  []byte // JSON encoded data  (papel da operação)
+ Code    string // Machine-readable error code (papel da aplicação)
+ Message string // Human-readable message (papel do usuário final)
+ Op      string // Logical operation (papel da operação)
+ Err     error  // Embedded error  (papel da operação)
+ Detail  []byte // JSON encoded data  (papel da operação)
 }
 ```
 
@@ -263,27 +260,27 @@ Escolher uma das opções a seguir, definidas no arquivo *internal/errors/errors
 ```go
 //Find address na camada de repositório
 func (r *MongoRepository) Find(id entity.ID) (*entity.Address, error) {
-    result := entity.Address{}
-    session := r.pool.Session(nil)
-    defer session.Close()
-    coll := session.DB(r.db).C("address")
-    err := coll.Find(bson.M{"_id": id}).One(&result)
+	result := entity.Address{}
+	session := r.pool.Session(nil)
+	defer session.Close()
+	coll := session.DB(r.db).C("address")
+	err := coll.Find(bson.M{"_id": id}).One(&result)
 
-    if err != nil {
-        return nil, &errors.Error{Op: "address.MongoRepository.Find", Err: err, Code: errors.ENOTFOUND}
-    }
-    return &result, nil
+	if err != nil {
+		return nil, &errors.Error{Op: "address.MongoRepository.Find", Err: err, Code: errors.ENOTFOUND}
+	}
+	return &result, nil
 }
 ```
 
 ```go
 //Find an address na camada de serviço
 func (s *Service) Find(id entity.ID) (*entity.Address, error) {
-  a, err := s.repo.Find(id) //está usando o MongoRepository
-  if err != nil {
-     return nil, &errors.Error{Op: "address.Service.Find", Err: err, Code: errors.ErrorCode(err)}
-  }
-  return a, nil
+	a, err := s.repo.Find(id) //está usando o MongoRepository
+	if err != nil {
+		return nil, &errors.Error{Op: "address.Service.Find", Err: err, Code: errors.ErrorCode(err)}
+	}
+	return a, nil
 }
 ```
 
@@ -294,10 +291,10 @@ De acordo com a Clean Architecture, a camada responsável pela interação com a
 ```go
 a, err := services.Address.Find(entity.StringToID(id))
 if err != nil {
-    err.Message = "Erro lendo endereço"
-    errorService.Log(err, elog.ERROR)
-    errorService.RespondWithError(w, http.StatusNotFound, errors.ErrorCode(err), errors.ErrorMessage(err))
-    return
+ err.Message = "Erro lendo endereço"
+ errorService.Log(err, elog.ERROR)
+ errorService.RespondWithError(w, http.StatusNotFound, errors.ErrorCode(err), errors.ErrorMessage(err))
+ return
 }
 ```
 
@@ -359,30 +356,30 @@ Exemplo de teste usando o testify:
 package yours
 
 import (
-    "testing"
-    "github.com/stretchr/testify/assert"
+ "testing"
+
+ "github.com/stretchr/testify/assert"
 )
 
 func TestSomething(t *testing.T) {
 
-    // assert equality
-    assert.Equal(t, 123, 123, "they should be equal")
+ // assert equality
+ assert.Equal(t, 123, 123, "they should be equal")
 
-    // assert inequality
-    assert.NotEqual(t, 123, 456, "they should not be equal")
+ // assert inequality
+ assert.NotEqual(t, 123, 456, "they should not be equal")
 
-    // assert for nil (good for errors)
-    assert.Nil(t, object)
+ // assert for nil (good for errors)
+ assert.Nil(t, object)
 
-    // assert for not nil (good when you expect something)
-    if assert.NotNil(t, object) {
+ // assert for not nil (good when you expect something)
+ if assert.NotNil(t, object) {
 
-        // now we know that object isn't nil, we are safe to make
-        // further assertions without causing any errors
-        assert.Equal(t, "Something", object.Value)
+  // now we know that object isn't nil, we are safe to make
+  // further assertions without causing any errors
+  assert.Equal(t, "Something", object.Value)
 
-    }
-
+ }
 }
 ```
 
